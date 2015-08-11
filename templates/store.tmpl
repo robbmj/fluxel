@@ -1,0 +1,85 @@
+var AppDispatcher = require('../dispatcher/AppDispatcher');
+var EventEmitter = require('events').EventEmitter;
+var CommentConstants = require('../constants/<<NAME>>Constants');
+var ActionSrc = require('../constants/ActionConstants');
+var assign = require('object-assign');
+
+var CHANGE_EVENT = 'change';
+
+function handleViewAction(action) {
+	switch (action.actionType) {
+		case <<NAME>>Constants.CREATE:
+
+			break;
+		case <<NAME>>Constants.DESTROY:
+		
+			break;
+		case <<NAME>>Constants.UPDATE:
+		
+			break;
+		default:
+			// thorw exception
+	}
+}
+
+function handleServerAction(action) {
+	switch (action.actionType) {
+		case <<NAME>>Constants.SERVER_CREATE_SUCCESS:
+
+			break;
+		case <<NAME>>Constants.SERVER_CREATE_FAILED:
+		
+			break;
+		case <<NAME>>Constants.SERVER_DESTROY_SUCCESS:
+		
+			break;
+		case <<NAME>>Constants.SERVER_DESTROY_FAILED:
+
+			break;
+		case <<NAME>>Constants.SERVER_UPDATE_SUCCESS:
+		
+			break;
+		case <<NAME>>Constants.SERVER_UPDATE_FAILED:
+		
+			break;
+		case <<NAME>>Constants.SERVER_INIT_LOAD_SUCCESS:
+		
+			break;
+		case <<NAME>>Constants.SERVER_INIT_LOAD_FAILED:
+		
+			break;
+		default:
+			// thorw exception
+	}
+}
+
+var <<NAME>>Stroe = assign({}, EventEmitter.prototype, {
+
+	emitChange: function() {
+		this.emit(CHANGE_EVENT);
+	},
+
+	addChangeListener: function(callback) {
+		this.on(CHANGE_EVENT, callback);
+	},
+
+	removeChangeListener: function(callback) {
+		this.removeListener(CHANGE_EVENT, callback);
+	}
+});
+
+// Register callback to handle all updates
+AppDispatcher.register(function(action) {
+	switch (action.actionSrc) {
+  		case ActionSrc.VIEW:
+  			handleViewAction(action);
+  			break;
+		case ActionSrc.SERVER
+			handleServerAction(action);
+			break;
+		default:
+			// throw an error
+	}
+});
+
+module.exports = <NAME>>Store;

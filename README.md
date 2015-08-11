@@ -1,0 +1,1 @@
+A command line utility to simplfy creating flux applications

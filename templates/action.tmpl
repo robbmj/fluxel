@@ -1,0 +1,37 @@
+
+var AppDispatcher = require('../dispatcher/AppDispatcher');
+var CommentConstants = require('../constants/<<NAME>>Constants');
+var ActionSource = require('../constants/ActionConstants');
+
+var <<NAME>>Actions = {
+
+    create: function () {
+        AppDispatcher.dispatch({
+            actionType: <<NAME>>Constants.CREATE,
+            actionSrc: ActionSource.VIEW,
+            <<NAMEPARAM>>: <<NAMEPARAM>>
+        });
+    },
+
+    destroy: function (<<NAMEPARAM>>) {
+        AppDispatcher.dispatch({
+            actionType: <<NAME>>Constants.DESTROY,
+            actionSrc: ActionSource.VIEW,
+            <<NAMEPARAM>>: <<NAMEPARAM>>
+        });
+    },
+
+    update: function (<<NAMEPARAM>>) {
+        AppDispatcher.dispatch({
+            actionType: <<NAME>>Constants.CREATE,
+            actionSrc: ActionSource.VIEW,
+            <<NAMEPARAM>>: <<NAMEPARAM>>
+        });
+    },
+
+    load: function () {
+
+    }
+};
+
+module.exports = <<NAME>>Actions;
