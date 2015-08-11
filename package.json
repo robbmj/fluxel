@@ -1,46 +1,50 @@
 {
-  "name": "fluxel",
-  "version": "0.0.0",
-  "description": "A command line utility to simplfy creating flux applications",
-  "main": "src/app.js",
-  "dependencies": {
-    "body-parser": "^1.4.3",
-    "express": "^4.4.5",
-    "keymirror": "~0.1.0"
-  },
-  "devDependencies": {
-    "browserify": "^6.2.0",
-    "envify": "^3.0.0",
-    "jest-cli": "^0.4.3",
-    "uglify-js": "~2.4.15",
-    "watchify": "^2.1.1"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "watchify -o bin/bundle.js -v -d src/app.js",
-    "build": "browserify . -t [envify --NODE_ENV production] | uglifyjs -cm > bin/bundle.min.js",
-    "test": "jest"
-  },
-  "browserify": {
-    "transform": [
-      "envify"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/robbmj/fluxel.git"
-  },
-  "keywords": [
-    "Flux",
-    "Utility",
-    "CLI"
-  ],
-  "author": "Michael John Robb",
-  "bugs": {
-    "url": "https://github.com/robbmj/fluxel/issues"
-  },
-  "homepage": "https://github.com/robbmj/fluxel",
-  "engines" : {
-    "node" : "0.12.x"
-  }
+	"name": "fluxel",
+	"version": "0.0.0",
+	"description": "A command line utility to simplfy creating flux applications",
+	"main": "src/app.js",
+	"dependencies": {
+		"body-parser": "^1.4.3",
+		"express": "^4.4.5",
+		"keymirror": "~0.1.0"
+	},
+	"devDependencies": {
+		"browserify": "^6.2.0",
+		"envify": "^3.0.0",
+		"jest-cli": "^0.4.3",
+		"uglify-js": "~2.4.15",
+		"watchify": "^2.1.1"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "watchify -o bin/bundle.js -v -d src/app.js",
+		"build": "browserify . -t [envify --NODE_ENV production] | uglifyjs -cm > bin/bundle.min.js",
+		"test": "jest"
+	},
+	"browserify": {
+		"transform": [
+		"envify"
+		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/robbmj/fluxel.git"
+	},
+	"keywords": [
+		"Flux",
+		"Utility",
+		"CLI"
+	],
+	"author": "Michael John Robb",
+	"bugs": {
+		"url": "https://github.com/robbmj/fluxel/issues"
+	},
+	"homepage": "https://github.com/robbmj/fluxel",
+	"engines" : {
+		"node" : "0.12.x"
+	},
+	"preferGlobal": "true",
+	"bin": {
+		"fluxel" : "lib/fluxel.js"
+  	}
 }

@@ -2,7 +2,7 @@
 var Constants = {
 	CREATE: 'create',
 	APP: 'app',
-	OBJECT: 'opbject'
+	OBJECT: 'object'
 };
 
 module.exports = Constants;

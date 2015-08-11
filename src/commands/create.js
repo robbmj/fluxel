@@ -2,8 +2,7 @@
 var fs = require('fs');
 var __path = require('path');
 
-// fix this
-var dir_structure = require('../directory_structure');
+var Template = require('../template');
 var Constants = require('../constants');
 
 function create_dir(path, mask, cb) {
@@ -40,6 +39,7 @@ function err_cb(full_path) {
 }
 
 function create_app(path, app_name) {
+	var dir_structure = Template.dir_structure();
 	path = path + '/' + app_name;
 	create_dir(path, err_cb(path));
 	recursive_create(path, dir_structure.directories);
@@ -77,19 +77,21 @@ function recursive_create(full_path, dirs) {
 
 function create_files(path, files, object_name) {
 	
-	object_name = object_name || '  ';
-
-	var param_name = (object_name[0].toLowerCase() + object_name.substring(1)).trim();
-
 	files.forEach(function (file) {
 		
 		if (file.tmpl !== undefined) {
+			// this is stupid
+			object_name = object_name || '  ';
 			var full_path = __path.join(__dirname, '../../' + file.tmpl);
+			var param_name = (object_name[0].toLowerCase() + object_name.substring(1)).trim();
+
 			fs.readFile(full_path, 'utf8', function (err, contents) {
 				if (err) {
 					throw err;
 				}
-				contents = contents.replace(/<<PARAMNAME>>/g, param_name);
+
+				// TODO: move responsibility for this to the Template object
+				contents = contents.replace(/<<NAMEPARAM>>/g, param_name);
 				contents = contents.replace(/<<NAME>>/g, object_name);
 
 				create_file(path + '/' + file.name, contents);
@@ -103,7 +105,7 @@ function create_files(path, files, object_name) {
 }
 
 function create_file(full_path, contents) {
-	console.log('Creating File: ' + full_path + '\nContents:\n' + contents);
+	console.log('Creating File: ' + full_path);
 	fs.writeFile(full_path, contents, function (err) {
         if (err) {
         	throw err;
@@ -111,8 +113,43 @@ function create_file(full_path, contents) {
     });
 }
 
-function create_object(object_name) {
+function find_app_dir() {
+	// todo, code for the case when fluxel is envoked from a sub directory
+}
 
+function create_object(path, object_name) {
+	console.log(path + '/.fluxel.json');
+	fs.readFile(path + '/.fluxel.json', function (err, data) {
+		if (err) {
+			throw err;
+		}
+
+		var app_state = JSON.parse(data);
+		if (app_state.objects[object_name] !== undefined) {
+			throw "Can't create object " + object_name + " it already exists"; 
+		}
+
+		app_state.objects[object_name] = [];
+
+		var object_templates = Template.object_templates(object_name);
+
+		object_templates.forEach(function (template) {
+			Template.load_template(template.tmpl, object_name, function (err, contents) {
+
+				if (err) {
+					throw err;
+				}
+
+				create_file(path + '/' + template.name, contents);
+
+				app_state.objects[object_name].push(template.name);
+			});
+		});
+
+		// BUG: not writing components that were created as the above loop is async
+		//create_file(path + '/.fluxel.json', JSON.stringify(app_state, null, 4));
+		//console.log(JSON.stringify(app_state, null, 4));
+	});
 }
 
 module.exports = function (cwd, action, value) {
@@ -121,7 +158,7 @@ module.exports = function (cwd, action, value) {
 			create_app(cwd, value);
 			break;
 		case Constants.OBJECT:
-			create_object();
+			create_object(cwd, value);
 			break;
 	}
 };

@@ -62,4 +62,4 @@ function main() {
 	handleCommand(process.cwd(), command);
 }
 
-main();
+module.exports = main;
