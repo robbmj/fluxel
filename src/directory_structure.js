@@ -1,26 +1,39 @@
 
 var KeyMirror = require('keymirror');
 
-var dir = {
-	directories: {
-		src: src,
-		'public', 'public'
-	},
+var src = {
+	directories: KeyMirror({
+		actions: null,
+		constants: null,
+		dispather: null,
+		stores: null,
+		views: null
+	}),
 	files: [
-		{name: 'package.json', tmpl: 'package.tmpl'},
-		{name: 'LICENSE', tmpl: ''},
-		{name: 'README.md', tmpl: ''},
-		{name: '.gitignore', tmpl: 'gitignore.tmpl'},
+		{name: 'app.js', tmpl: 'templates/app.tmpl'}
 	]
 };
 
-var src = {
-	directories: KeyMirror({
-		actions,
-		constants,
-		dispather,
-		stores,
-		views
-	}),
-	files: ['app.js']
+
+src.directories.dispather = {
+	directories: {},
+	files: [
+		{name: 'AppDispatcher.js', tmpl: 'templates/dispatcher.tmpl'}
+	]
 };
+
+var dir = {
+	directories: {
+		src: src,
+		'public': 'public'
+	},
+	files: [
+		{name: 'package.json', tmpl: 'templates/package.tmpl'},
+		{name: 'LICENSE'},
+		{name: 'README.md'},
+		{name: '.gitignore', tmpl: 'templates/gitignore.tmpl'}
+	]
+};
+
+console.log(JSON.stringify(dir, null, 4));
+module.exports = dir;
