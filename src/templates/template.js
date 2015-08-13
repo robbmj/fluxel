@@ -53,14 +53,23 @@ var dir = {
 			files: [
 				{name: 'index.html', tmpl: TMPL_LOC + '/index.html.tmpl'}
 			]
-		}
+		},
+		dist: {
+			directories: {},
+			files: [
+				{name: 'app.js'}
+			]
+		},
+		bin: {directories: {}, files: []},
+		lib: {directories: {}, files: []}
 	},
 	files: [
 		{name: 'package.json', tmpl: TMPL_LOC + '/package.tmpl'},
 		{name: 'LICENSE'},
 		{name: 'README.md'},
 		{name: '.gitignore', tmpl: TMPL_LOC + '/gitignore.tmpl'},
-		{name: '.fluxel.json', tmpl: TMPL_LOC + '/fluxel.tmpl'}
+		{name: '.fluxel.json', tmpl: TMPL_LOC + '/fluxel.tmpl'},
+		{name: 'gulpfile.js', tmpl: TMPL_LOC + '/gulpfile.js.tmpl'}
 	]
 };
 
