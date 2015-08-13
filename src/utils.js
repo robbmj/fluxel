@@ -1,11 +1,13 @@
 
 
 function object_map(object, cb) {
-	for (var key in object) {
-		if (object.hasOwnProperty(key)) {
-			cb(key, object[key]);
+	//var new_obj = {}, key;
+	for (key in object) {
+		if (object.hasOwnProperty(key) && cb(key, object[key])) {
+			new_obj[key] = object[key];
 		}
 	}
+//	return new_obj;
 }
 
 var AppConstants = {

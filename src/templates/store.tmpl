@@ -12,10 +12,10 @@ function handleViewAction(action) {
 
 			break;
 		case <<NAME>>Constants.DESTROY:
-		
+
 			break;
 		case <<NAME>>Constants.UPDATE:
-		
+
 			break;
 		default:
 			// thorw exception
@@ -28,53 +28,53 @@ function handleServerAction(action) {
 
 			break;
 		case <<NAME>>Constants.SERVER_CREATE_FAILED:
-		
+
 			break;
 		case <<NAME>>Constants.SERVER_DESTROY_SUCCESS:
-		
+
 			break;
 		case <<NAME>>Constants.SERVER_DESTROY_FAILED:
 
 			break;
 		case <<NAME>>Constants.SERVER_UPDATE_SUCCESS:
-		
+
 			break;
 		case <<NAME>>Constants.SERVER_UPDATE_FAILED:
-		
+
 			break;
 		case <<NAME>>Constants.SERVER_INIT_LOAD_SUCCESS:
-		
+
 			break;
 		case <<NAME>>Constants.SERVER_INIT_LOAD_FAILED:
-		
+
 			break;
 		default:
 			// thorw exception
 	}
 }
 
-var <<NAME>>Stroe = assign({}, EventEmitter.prototype, {
+var <<NAME>>Store = assign({}, EventEmitter.prototype, {
 
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
 	},
 
-	addChangeListener: function(callback) {
+	addChangeListener: function (callback) {
 		this.on(CHANGE_EVENT, callback);
 	},
 
-	removeChangeListener: function(callback) {
+	removeChangeListener: function (callback) {
 		this.removeListener(CHANGE_EVENT, callback);
 	}
 });
 
 // Register callback to handle all updates
-AppDispatcher.register(function(action) {
+AppDispatcher.register(function (action) {
 	switch (action.actionSrc) {
   		case ActionSrc.VIEW:
   			handleViewAction(action);
   			break;
-		case ActionSrc.SERVER
+		case ActionSrc.SERVER:
 			handleServerAction(action);
 			break;
 		default:

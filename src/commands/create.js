@@ -50,11 +50,11 @@ function create_app(path, app_name) {
 	var dir_structure = Template.dir_structure();
 	path = path + '/' + app_name;
 	create_dir(path, err_cb(path));
-	recursive_create(path, dir_structure.directories);
-	create_files(path, dir_structure.files, app_name);
+	recursive_create(path, dir_structure.directories, app_name);
+	create_files(path, dir_structure.files, app_name, app_name);
 }
 
-function recursive_create(full_path, dirs) {
+function recursive_create(full_path, dirs, object_name) {
 	object_map(dirs, function (dir_name, value) {
 
 		// create the directory: the object's property value is the directory name
@@ -64,12 +64,12 @@ function recursive_create(full_path, dirs) {
 		if (typeof value === 'object') {
 			// check to see if sub directories need to be made
 			if (typeof value.directories === 'object') {
-				recursive_create(full_path + '/' + dir_name, value.directories);
+				recursive_create(full_path + '/' + dir_name, value.directories, object_name);
 			}
 
 			// check to see if any files need to be made.
 			if (Array.isArray(value.files)) {
-				create_files(full_path + '/' + dir_name, value.files);
+				create_files(full_path + '/' + dir_name, value.files, object_name);
 			}
 		}
 	});
@@ -80,19 +80,11 @@ function create_files(path, files, object_name) {
 	files.forEach(function (file) {
 
 		if (file.tmpl !== undefined) {
-			// this is stupid
-			object_name = object_name || '  ';
-			var full_path = __path.join(__dirname, '../../' + file.tmpl);
-			var param_name = (object_name[0].toLowerCase() + object_name.substring(1)).trim();
 
-			fs.readFile(full_path, 'utf8', function (err, contents) {
+			Template.load_template(file.tmpl, object_name, function (err, contents) {
 				if (err) {
 					throw err;
 				}
-
-				// TODO: move responsibility for this to the Template object
-				contents = contents.replace(/<<NAMEPARAM>>/g, param_name);
-				contents = contents.replace(/<<NAME>>/g, object_name);
 
 				create_file(path + '/' + file.name, contents);
 			});
@@ -100,7 +92,6 @@ function create_files(path, files, object_name) {
 		else {
 			create_file(path + '/' + file.name, '');
 		}
-
 	});
 }
 

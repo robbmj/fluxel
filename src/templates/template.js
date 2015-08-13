@@ -4,14 +4,14 @@ var __path = require('path');
 
 var KeyMirror = require('keymirror');
 
-var TMPL_LOC = './';
+var TMPL_LOC = __path.join(__dirname);
 
 // describes the default layout of the src folder
 var src = {
 	directories: KeyMirror({
 		actions: null,
 		constants: null,
-		dispather: null,
+		dispatcher: null,
 		stores: null,
 		views: null
 	}),
@@ -21,7 +21,7 @@ var src = {
 };
 
 // add the dispatcher template to the dispater directory
-src.directories.dispather = {
+src.directories.dispatcher = {
 	directories: {},
 	files: [
 		{name: 'AppDispatcher.js', tmpl: TMPL_LOC + '/dispatcher.tmpl'}
@@ -32,15 +32,28 @@ src.directories.dispather = {
 src.directories.constants = {
 	directories: {},
 	files: [
-		{name: 'ActionsConstants.js', tmpl: TMPL_LOC + '/action_constatnts.tmpl'}
+		{name: 'ActionConstants.js', tmpl: TMPL_LOC + '/action_constatnts.tmpl'}
 	]
 };
+
+src.directories.views = {
+	directories: {},
+	files: [
+		{name: 'ItWorks.react.js', tmpl: TMPL_LOC + '/itworks.tmpl'}
+	]
+};
+
 
 // describes the entire application directory structure
 var dir = {
 	directories: {
 		src: src,
-		'public': 'public'
+		'public': {
+			directories: {},
+			files: [
+				{name: 'index.html', tmpl: TMPL_LOC + '/index.html.tmpl'}
+			]
+		}
 	},
 	files: [
 		{name: 'package.json', tmpl: TMPL_LOC + '/package.tmpl'},
@@ -66,10 +79,10 @@ var Template = {
 	 */
 	object_templates: function (object_name) {
 		return [
-			{name: 'src/actions/'	+ object_name + 'Actions.js', 	tmpl: TMPL_LOC + '/action.tmpl'},
-			{name: 'src/constants/' + object_name + 'Constants.js',	tmpl: TMPL_LOC + '/constant.tmpl'},
-			{name: 'src/stores/'	+ object_name + 'Stores.js',	tmpl: TMPL_LOC + '/store.tmpl'},
-			{name: 'src/views/'		+ object_name + 'Views.js',		tmpl: TMPL_LOC + '/view.tmpl'},
+			this.action_template(object_name),
+			this.constant_template(object_name),
+			this.store_template(object_name),
+			this.view_template(object_name)
 		];
 	},
 	/**
@@ -78,19 +91,42 @@ var Template = {
 	 *	@cb: a function that will be called when the tamplate has been loaded, parms cb(err, contents)
 	 *		where contents is the parsed template
 	 */
+	action_template: function (object_name) {
+		return {name: 'src/actions/'+ object_name + 'Actions.js', tmpl: TMPL_LOC + '/action.tmpl'};
+	},
+	constant_template: function (object_name) {
+		return {name: 'src/constants/' + object_name + 'Constants.js', tmpl: TMPL_LOC + '/constant.tmpl'};
+	},
+	store_template: function (object_name) {
+		return {name: 'src/stores/'	+ object_name + 'Store.js', tmpl: TMPL_LOC + '/store.tmpl'};
+	},
+	view_template: function (object_name) {
+		return {name: 'src/views/' + object_name + 'Views.js', tmpl: TMPL_LOC + '/view.react.tmpl'};
+	},
+	app_template: function (object_name) {
+
+	},
 	load_template: function (tmpl, object_name, cb) {
+
+		console.log('object name:', object_name);
+
 		if (typeof object_name === 'function') {
 			cb = object_name;
 			object_name = '  ';
 		}
 
-		var full_path = __path.join(__dirname, '/' + tmpl);
-		console.log(full_path);
+		var full_path = tmpl;
+		//console.log('path:',full_path);
+
 		fs.readFile(full_path, 'utf8', function (err, contents) {
+
+			console.log('object name:', object_name);
+
 			if (err) {
-				cb(err, null);
-				return;
+				return cb(err, null);
 			}
+
+
 
 			var param_name = (object_name[0].toLowerCase() + object_name.substring(1)).trim();
 			contents = contents.replace(/<<NAMEPARAM>>/g, param_name);

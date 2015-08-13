@@ -1,5 +1,35 @@
 {
 	"name": "<<NAME>>",
  	"version": "0.0.0",
-	"description": ""
+	"description": "",
+	"licence": "",
+	"author": "",
+	"dependencies": {
+	    "flux": "^2.0.1",
+	    "keymirror": "~0.1.0",
+	    "object-assign": "^1.0.0",
+	    "react": "^0.13.0"
+  	},
+  	"devDependencies": {
+      "body-parser": "^1.4.3",
+    	"browserify": "^6.2.0",
+    	"envify": "^3.0.0",
+    	"uglify-js": "~2.4.15",
+    	"watchify": "^2.1.1",
+    	"express": "^4.4.5",
+      "reactify": "^0.15.2"
+  	},
+  	"scripts": {
+    	"start": "watchify -o public/bundle.js -v -d src/app.js",
+    	"build": "browserify . -t [envify --NODE_ENV production] | uglifyjs -cm > public/bundle.min.js"
+  	},
+  	"browserify": {
+    	"transform": [
+      		"reactify",
+          "envify"
+    	]
+  	},
+    "engines": {
+      "node": "0.12.x"
+    }
 }
