@@ -13,6 +13,7 @@ function object_map(object, cb) {
 var AppConstants = {
 	CREATE: 'create',
 	APP: 'app',
+	COMPONENT: 'component',
 	OBJECT: 'objects'
 };
 
