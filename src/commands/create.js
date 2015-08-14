@@ -110,7 +110,7 @@ function find_app_dir() {
 
 // TODO break this up to more easily support commands like "create store" Foo or "create view Bar"
 function create_object(path, object_name) {
-	console.log(path + '/.fluxel.json');
+
 	fs.readFile(path + '/.fluxel.json', function (err, data) {
 		if (err) {
 			throw err;
@@ -131,12 +131,11 @@ function create_object(path, object_name) {
 				// load the template and replace <<NAME>> with the object name
 				Template.load_template(template.tmpl, object_name, function (err, contents) {
 					if (err) {
-						//console.log(path);
-						//console.log(template.tmpl);
+						console.log('failed to create:', path);
+						console.log('Contents:', template.tmpl);
 						reject(false);
 					}
 					else {
-						console.log(contents);
 						// create files and write the templates to the files
 						create_file(path + '/' + template.name, contents);
 						// update the app state json file

@@ -110,7 +110,7 @@ var Template = {
 		return {name: 'src/stores/'	+ object_name + 'Store.js', tmpl: TMPL_LOC + '/store.tmpl'};
 	},
 	view_template: function (object_name) {
-		return {name: 'src/views/' + object_name + 'Views.js', tmpl: TMPL_LOC + '/view.react.tmpl'};
+		return {name: 'src/views/' + object_name + 'Components.react.js', tmpl: TMPL_LOC + '/view.react.tmpl'};
 	},
 	app_template: function (object_name) {
 
