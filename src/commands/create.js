@@ -1,14 +1,10 @@
 
 // standard lib
 var fs = require('fs');
-var __path = require('path');
-
-// third party
-var Promise = require('promise');
 
 // objects
-var Template = require('../templates/template');
-var AppConstants = require('../utils').AppConstants;
+var TemplateManager = require('../template/TemplateManager');
+var FluxelConstants = require('../utils').AppConstants;
 
 // functions
 var object_map = require('../utils').object_map;
@@ -46,57 +42,39 @@ function err_cb(full_path) {
 	};
 }
 
-function create_app(path, app_name) {
-	var dir_structure = Template.dir_structure();
-	path = path + '/' + app_name;
-	create_dir(path, err_cb(path));
-	recursive_create(path, dir_structure.directories, app_name);
-	create_files(path, dir_structure.files, app_name, app_name);
-}
-
-function recursive_create(full_path, dirs, object_name) {
-	object_map(dirs, function (dir_name, value) {
-
-		// create the directory: the object's property value is the directory name
-		create_dir(full_path + '/' + dir_name, err_cb(full_path + '/' + dir_name));
-
-		// do we need to put stuff in the directory?
-		if (typeof value === 'object') {
-			// check to see if sub directories need to be made
-			if (typeof value.directories === 'object') {
-				recursive_create(full_path + '/' + dir_name, value.directories, object_name);
-			}
-
-			// check to see if any files need to be made.
-			if (Array.isArray(value.files)) {
-				create_files(full_path + '/' + dir_name, value.files, object_name);
-			}
+function tmpl_cb(_path) {
+	return function (err, obj) {
+		if (err) {
+			throw err;
 		}
-	});
-}
 
-function create_files(path, files, object_name) {
+		var fullpath = _path + '/' + obj.name;
 
-	files.forEach(function (file) {
-
-		if (file.tmpl !== undefined) {
-
-			Template.load_template(file.tmpl, object_name, function (err, contents) {
-				if (err) {
-					throw err;
-				}
-
-				create_file(path + '/' + file.name, contents);
-			});
+		if (obj.is_dir) {
+			create_dir(fullpath, err_cb(fullpath));
 		}
 		else {
-			create_file(path + '/' + file.name, '');
+			create_file(fullpath, obj.contents);
 		}
-	});
+	};
+}
+
+function create_app(path, app_name) {
+	path = path + '/' + app_name;
+	create_dir(path, err_cb(path));
+
+	var tm = new TemplateManager();
+	tm.for_each_template(tm.APP, app_name, tmpl_cb(path));
+
+	path = path + '/src/ItWorks';
+	create_dir(path, err_cb(path));
+	tm.set_template(tm.COMPONENT, require('../template/ItWorksTemplate'));
+	tm.for_each_template(tm.COMPONENT, 'ItWorks', tmpl_cb(path));
 }
 
 function create_file(full_path, contents) {
 	console.log('Creating File: ' + full_path);
+
 	fs.writeFile(full_path, contents, function (err) {
 		if (err) {
 			throw err;
@@ -108,8 +86,18 @@ function find_app_dir() {
 	// todo, code for the case when fluxel is envoked from a sub directory
 }
 
-// TODO break this up to more easily support commands like "create store" Foo or "create view Bar"
-function create_object(path, object_name) {
+function create_objects_in_component(path, component_name, object_name, filter) {
+	var tm = new TemplateManager();
+	path = path + '/src/' + component_name;
+
+	// TODO: check app state
+	tm.for_each_template(tm.COMPONENT, object_name, tmpl_cb(path), filter);
+}
+
+function create_component(path, component_name, filter) {
+
+	var tm = new TemplateManager();
+
 
 	fs.readFile(path + '/.fluxel.json', function (err, data) {
 		if (err) {
@@ -117,52 +105,29 @@ function create_object(path, object_name) {
 		}
 
 		var app_state = JSON.parse(data);
-		if (app_state.objects[object_name] !== undefined) {
-			throw "Can't create object " + object_name + " it already exists";
+		if (app_state.objects[component_name] !== undefined) {
+			throw "Can't create object " + component_name + " it already exists";
 		}
 
-		app_state.objects[object_name] = [];
+		app_state.objects[component_name] = [];
 
-		var object_templates = Template.object_templates(object_name);
+		path = path + '/src/' + component_name;
+		create_dir(path, err_cb(path));
 
-		// create an array of promises
-		var promises = object_templates.map(function (template) {
-			return new Promise(function (resolve, reject) {
-				// load the template and replace <<NAME>> with the object name
-				Template.load_template(template.tmpl, object_name, function (err, contents) {
-					if (err) {
-						console.log('failed to create:', path);
-						console.log('Contents:', template.tmpl);
-						reject(false);
-					}
-					else {
-						// create files and write the templates to the files
-						create_file(path + '/' + template.name, contents);
-						// update the app state json file
-						app_state.objects[object_name].push(template.name);
-						resolve(true);
-					}
-				});
-			});
-		});
-
-		Promise.all(promises).then(function (res) {
-			// if all files were create successfuly
-			if (res.filter(function (e) { return !e; }).length === 0) {
-				// update the app state file
-				create_file(path + '/.fluxel.json', JSON.stringify(app_state, null, 4));
-			}
-		});
+		tm.for_each_template(tm.COMPONENT, component_name, tmpl_cb(path), filter);
 	});
 }
 
 module.exports = function (command) {
 	switch (command.create) {
-		case AppConstants.APP:
+		case FluxelConstants.APP:
 			create_app(command.path, command.name);
 			break;
-		case AppConstants.OBJECT:
-			create_object(command.path, command.name);
+		case FluxelConstants.COMPONENT:
+			create_component(command.path, command.name, command.filter);
+			break;
+		case FluxelConstants.ADDTOCOMPONENT:
+			create_objects_in_component(command.path, command.name, command.add, command.filter);
 			break;
 	}
 };

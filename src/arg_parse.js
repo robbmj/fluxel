@@ -29,6 +29,20 @@ var validation = {
 				return new RegExp('^[A-Z]([a-zA-z]+)$').test(value);
 			},
 			'default': null
+		},
+		filter: {
+			required: false,
+			is_valid: function (value) {
+				return true;
+			},
+			'default': []
+		},
+		add: {
+			required: false,
+			is_valid: function (value) {
+				return new RegExp('^[A-Z]([a-zA-z]+)$').test(value);
+			},
+			'default': 'Ignore'
 		}
 	},
 	runserver: {
@@ -43,17 +57,25 @@ var validation = {
 };
 
 var known_ops = {
-	create: ['app', 'objects', 'store', 'action', 'const', 'view'],
+	create: ['app', 'component', 'addtocomponent'],
 	name: [String],
+
+
+
 	// BUG: there apears to be a bug here, if --runserver or -r are not supplied a value
 	// nopt seems to assign runserver a value of 1
 	runserver: [Number, null],
+
+	filter: [String, Array],
+
+	add: [String, null]
 };
 
 var short_hands = {
 	c: '--create',
 	n: '--name',
 	r: '--runserver',
+	f: '--filter'
 };
 
 function validate_command(parsed_args) {
@@ -113,8 +135,7 @@ function parse(argv) {
 		process.exit();
 	}
 
-
-	//console.log(cmd_obj);
+//console.log(cmd_obj); process.exit();
 	return cmd_obj;
 }
 

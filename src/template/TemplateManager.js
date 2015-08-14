@@ -18,7 +18,7 @@ function helper(directory, name, cb) {
 		});
 
 		if (instruction.files !== undefined) {
-			load_files(instruction.files, name, cb);
+			load_files(instruction.files, name, dir_name, cb);
 		}
 
 		if (instruction.directories !== undefined) {
@@ -27,7 +27,7 @@ function helper(directory, name, cb) {
 	});
 }
 
-function load_files(files, name, cb) {
+function load_files(files, name, dir_name, cb) {
 	files.forEach(function (template_name) {
 
 		if (template_name.indexOf('.tmpl') !== -1) {
@@ -53,7 +53,7 @@ function load_files(files, name, cb) {
 				file_name = file_name.replace('.tmpl', '');
 
 				cb(null, {
-					name: file_name,
+					name: dir_name + '/' + file_name,
 					contents: contents,
 					is_dir: false
 				});
@@ -62,16 +62,48 @@ function load_files(files, name, cb) {
 	});
 }
 
-function for_each_template(type, name, callback) {
+
+function TemplateManager() {
+	this.app_template = App;
+	this.component_template = Component;
+
+	this.App = FluxelConstants.App;
+	this.COMPONENT = FluxelConstants.COMPONENT;
+
+	this.ACTION = FluxelConstants.ACTION;
+	this.CONSTANTS = FluxelConstants.CONSTANTS;
+	this.STORE = FluxelConstants.STORE;
+	this.VIEW = FluxelConstants.VIEW
+}
+
+TemplateManager.new = function () {
+	return new TemplateManager();
+}
+
+TemplateManager.prototype.set_template = function (type, obj) {
+	switch (type) {
+		case FluxelConstants.COMPONENT:
+			this.component_template = obj;
+			break;
+		default:
+			throw 'Template type: ' + type + ' is not valid';
+	}
+};
+
+TemplateManager.prototype.for_each_template = function (type, name, callback, filter) {
 	var dir_structure;
 
+	if (Array.isArray(filter) && filter.length == 0) {
+		filter = null;
+	}
+
 	switch (type) {
-		case FluxelConstants.APP:
-			dir_structure = App.dir_structure();
+		case this.APP:
+			dir_structure = this.app_template.dir_structure(filter);
 			break;
 
-		case FluxelConstants.COMPONENT:
-			dir_structure = Component.dir_structure();
+		case this.COMPONENT:
+			dir_structure = this.component_template.dir_structure(filter);
 			break;
 
 		default:
@@ -79,13 +111,17 @@ function for_each_template(type, name, callback) {
 	}
 
 	helper(dir_structure.directories, name, callback);
-	load_files(dir_structure.files, name, callback);
+	load_files(dir_structure.files, name, '.', callback);
 };
 
+module.exports = TemplateManager;
 
 
+/*var tm = new TemplateManager();
 
-for_each_template(FluxelConstants.APP, 'Foo', function (err, fs_obj) {
+tm.set_template(tm.COMPONENT, require('./ItWorksTemplate'));
+
+tm.for_each_template(FluxelConstants.COMPONENT, 'ItWorks', function (err, fs_obj) {
 
 	if (err) {
 		console.log('Err:', err);
@@ -97,4 +133,4 @@ for_each_template(FluxelConstants.APP, 'Foo', function (err, fs_obj) {
 		console.log(fs_obj.is_dir);
 		console.log('----------------------------------------------------');
 	}
-});
+});*/

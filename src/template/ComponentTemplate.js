@@ -1,4 +1,6 @@
 
+var object_map = require('../utils').object_map;
+
 var path = require('path').join(__dirname, './component_templates/');
 
 // better that concating every element with + or path.concat
@@ -15,7 +17,7 @@ var dir_structure = {
 			files: [r('__Dispatcher.js.tmpl')]
 		},
 		constants: {
-			files: [r('__Constants.js.tmpl')]
+			files: [r('__Constants.js.tmpl'), r('ActionConstants.js.tmpl')]
 		},
 		store: {
 			files: [r('__Store.js.tmpl')]
@@ -28,9 +30,23 @@ var dir_structure = {
 };
 
 var ComponentTemplate = {
-	dir_structure: function (component_name, callback) {
-		return dir_structure;
-	},
+	dir_structure: function (filter) {
+		if (!filter) {
+			return dir_structure;
+		}
+		var subset = {directories: {}};
+
+		if (filter.indexOf('files') !== -1) {
+			subset.files = dir_structure.files;
+		}
+
+		object_map(dir_structure.directories, function (dir_name, instruction) {
+			if (filter.indexOf(dir_name) > -1) {
+				subset.directories[dir_name] = instruction;
+			}
+		});
+		return subset;
+	}
 };
 
 module.exports = ComponentTemplate;
